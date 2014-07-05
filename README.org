@@ -1,0 +1,14 @@
+#+TITLE: Org On Python
+
+You've tried org, but have you tried org while on... Python!?
+
+* Overview
+
+I want a way to process Org files using Python and typically from Emacs.  This desire is largely driven because I have not managed to become as comfortable in Elisp as I have in Python.  There are existing Org document parsers accessible from Python but they are all limited to a sub-set of the Org syntax. 
+
+Org On Python was born out of an idea on the org-mode mailing list to use Emacs to do the parsing.  After all, it's the best parser around, by construction.  Since v8 of org there is a new =org-element= system to handle the parsing into a syntax tree.  Except for inter-object references, this tree is flat and full of simple data types and can be relatively trivially serialized to text either in a sexp format or JSON.
+
+* How to
+
+This is still a work in progress.
+
