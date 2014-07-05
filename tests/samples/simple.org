@@ -1,0 +1,16 @@
+#+TITLE: This document has a title.
+#+AUTHOR: It was written by someone
+
+* This is a simple document
+
+It has one line.
+
+Followed by another.
+
+** It has a subheading
+
+With some text.
+
+And a little bit more.
+
+* The End
