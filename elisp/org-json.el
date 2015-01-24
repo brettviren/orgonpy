@@ -7,7 +7,47 @@
 
 (require 'json)
 
+
+(defun org-json-straigten-tree (tree)
+  "Null out circular references in the org-element TREE"
+  (org-element-map tree (append org-element-all-elements
+				org-element-all-objects '(plain-text))
+
+    ;; the crux of this is to nullify references that turn the tree
+    ;; into a Circular Object which the json module can't handle
+    (lambda (x) 
+      ;; guaranteed circluar
+      (if (org-element-property :parent x)
+	  (org-element-put-property x :parent "none"))
+      ;; maybe circular if multiple structures accidently identical
+      (if (org-element-property :structure x)
+	  (org-element-put-property x :structure "none"))
+      ))
+  tree)
+
+(defun org-json-tree-to-json-string (tree)
+  "Return a JSON formatted string representing the given org-element tree"
+  (json-encode (org-json-straigten-tree tree)))
+
+(defun org-json-buffer-to-tree ()
+  "Return org-element tree for current buffer"
+  (org-element-parse-buffer 'object nil))
+
+(defun org-json-buffer-to-json-string ()
+  "Return a JSON formatted string representing the org-element tree from the current org buffer"
+  (interactive)
+  (let* ((tree (org-json-buffer-to-tree)))
+    (org-json-tree-to-json-string tree)))
+
 (defun org-json-buffer-to-json-file (&optional path)
+  "Write a JSON file from the current org buffer"
+  (interactive "Fwrite to JSON file: ")
+  (let ((tree (org-json-straigten-tree
+               (org-json-buffer-to-tree))))
+    (with-temp-file path
+      (insert (org-json-tree-to-json-string tree)))))
+
+(defun org-json-buffer-to-json-file-old (&optional path)
   "Write a JSON file from the current org buffer"
   (interactive "Fwrite to JSON file: ")
   (let* ((tree (org-element-parse-buffer 'object nil)))
@@ -29,7 +69,7 @@
       (insert (json-encode tree)))))
 
 (defun org-json-buffer-to-sexp-file (&optional path)
-  "Write a JSON file from the current org buffer"
+  "Write a SEXP file from the current org buffer"
   (interactive "Fwrite to JSON file: ")
   (let* ((tree (org-element-parse-buffer 'object nil)))
     (org-element-map tree (append org-element-all-elements
@@ -87,3 +127,4 @@
 ;(org-json-schema-to-json-file "schema.json")
 	      
 		  
+(provide 'org-json)

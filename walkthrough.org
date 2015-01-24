@@ -1,0 +1,135 @@
+#+TITLE: A walk through of Orgonpy.
+#+AUTHOR: Brett Viren
+#+DATE: [2015-01-24 Sat]
+
+* Setup
+
+** Python
+
+You need to have the =orgonpy= Python module for this sample to work.  You can install it in many ways:
+
+*** TODO PyPI
+
+Note, =orgonpy= is not yet in PyPI so this section is lying to you.
+
+Recommended for testing:
+
+#+BEGIN_EXAMPLE
+  virtualenv venv
+  source venv/bin/activate
+  pip install [--user] orgonpy
+#+END_EXAMPLE
+
+Or, to install to your global user area:
+
+#+BEGIN_EXAMPLE
+  pip install --user orgonpy
+#+END_EXAMPLE
+
+Or, if you are foolishly trusting:
+
+#+BEGIN_EXAMPLE
+  sudo pip install orgonpy
+#+END_EXAMPLE
+
+*** Install for development
+
+If you want to hack on a live install do:
+
+#+BEGIN_EXAMPLE
+  virtualenv venv
+  source venv/bin/activate
+  python setup.py develop
+#+END_EXAMPLE
+
+*** Direct in-source usage
+
+The following examples all run in the same Python session.  Assuming you are evaluating this file in-source you can trick that session to find the in-source =orgonpy= by evaluating this code block:
+
+#+BEGIN_SRC python :results none :session walkthrough
+  import sys
+  if sys.path[0] != 'python':
+      sys.path.insert(0,'python')
+#+END_SRC
+
+
+** Emacs
+
+I still don't know how to package Emacs code so this is probably lame.
+
+Assuming you are sitting in-source execute this block:
+
+#+BEGIN_SRC  elisp :results silent :export code
+  (load-file "elisp/org-json.el")
+#+END_SRC
+
+* JSON conversion
+
+Orgonpy is based on extracting the precise org document structure to JSON based on Org's own org-element structure.  This conversion is provided by the function =org-json-buffer-to-json-file= from [[./elisp/org-json.el][org-json.el]].  To convert *this* org file execute this block:
+
+#+BEGIN_SRC elisp :results silent :export code
+  (org-json-buffer-to-json-file-new "walkthrough.json")
+#+END_SRC
+
+The file should now be available at [[./walkthrough.json]].
+
+** Details of conversion
+
+The conversion process is broken down.  First the org-element tree for the current buffer it got.
+
+#+BEGIN_SRC elisp :results silent :export code
+  (org-json-buffer-to-tree)
+#+END_SRC
+
+Then, the org-element tree is munged to nullify some references that otherwise lead to the data structure being circular.
+
+#+BEGIN_SRC elisp :results silent :export code
+  (org-json-straigten-tree
+    (org-json-buffer-to-tree))
+#+END_SRC
+
+Then, the tree can be safely passed to Emacs built-in JSON dumper.
+
+#+BEGIN_SRC elisp :results silent :export code
+  (org-json-tree-to-json-string
+   (org-json-straigten-tree
+    (org-json-buffer-to-tree)))
+#+END_SRC
+
+And finally, this JSON string can be saved to some file
+
+#+BEGIN_SRC elisp :results silent :export code
+  (let ((tree (org-json-straigten-tree
+               (org-json-buffer-to-tree))))
+    (with-temp-file "walkthrough-steps.json"
+      (insert (org-json-tree-to-json-string tree))))  
+#+END_SRC
+
+
+* Other conversions
+
+One can also write a SEXP form, just because we can:
+
+#+BEGIN_SRC elisp :results silent :export code
+  (org-json-buffer-to-sexp-file "walkthrough.sexp")
+#+END_SRC
+
+Executing that block gives you this file: [[./walkthrough.sexp]].
+
+* Schema
+
+An attempt to create a description of the org-element schema is made with =org-json-schema-to-json-file=.  The description is a JSON dump of lists of major parts found in org-element.  It is a slightly less human readable version of the [[http://orgmode.org/worg/dev/org-element-api.html][org-element API]] docs or the [[http://orgmode.org/worg/exporters/org-element-docstrings.html][org-element docstrings]].
+
+#+BEGIN_SRC elisp :results silent :export code
+  (org-json-schema-to-json-file "org-element-schema.json")
+#+END_SRC
+
+Executing that block should give you this file: [[./org-element-schema.json]]
+
+** TODO What good is this?
+
+The idea for this schema description is to derive from it some Python classes which enforce the org-element data structure.  This derivation can hopefully be purely driven by this schema description.  Eg, some Python code reads it in to dynamically create some =namedtuples=.  This hopefully can be done in such a way that when/if org-element changes its schema it can be re-dumped and the Python side will automatically adapt.  Anyways that's the pipe I'm smoking.
+
+* Exporting
+
+The whole intention of Orgonpy is to do a two step org export such as the existing LaTeX/PDF one but where the intermediate form is JSON and the second stage processing is anything you want.  I want Python but Orgonpy should provide and example that could be generalized.

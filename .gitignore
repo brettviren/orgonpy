@@ -1,2 +1,6 @@
 *~
 *.pyc
+venv
+.cut.py
+*.egg-info
+dist
