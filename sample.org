@@ -1,0 +1,133 @@
+#+TITLE: A sample org-mode file for org-json.
+#+AUTHOR: Brett Viren
+#+DATE: 2014-07005
+
+* A top level headline
+
+Some text with an example.
+
+#+BEGIN_EXAMPLE
+Here is the example
+#+END_EXAMPLE
+
+** This has a list
+
+- a
+- simple
+- list
+
+* What else
+
+How about some source?
+
+#+BEGIN_SRC elisp :results silent :export code
+(require 'json)
+(defun org-buffer-to-json-file (&optional path)
+  "Write a JSON file from the current org buffer"
+  (interactive "Fwrite to JSON file: ")
+  (let* ((tree (org-element-parse-buffer 'object nil)))
+    (org-element-map tree (append org-element-all-elements
+				  org-element-all-objects '(plain-text))
+
+      ;; the crux of this is to nullify references that turn the tree
+      ;; into a Circular Object which the json module can't handle
+      (lambda (x) 
+	;; guaranteed circluar
+        (if (org-element-property :parent x)
+            (org-element-put-property x :parent "none"))
+	;; maybe circular if multiple structures accidently identical
+        (if (org-element-property :structure x)
+            (org-element-put-property x :structure "none"))
+        ))
+
+    (with-temp-file path
+      (insert (json-encode tree)))))
+#+END_SRC
+
+
+
+Let's run it.
+
+#+BEGIN_SRC elisp :results silent :export code
+(org-buffer-to-json-file "sample.json")
+#+END_SRC
+
+What trouble can we get into with some Python?
+
+#+BEGIN_SRC python :session :results output code
+  import json, pprint
+  s = json.loads(open("sample.json").read())
+  print(type(s))
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_SRC python
+
+>>> <type 'list'>
+#+END_SRC
+
+Go on
+
+#+BEGIN_SRC python :session :results output code
+  pprint.pprint(s[0:2])
+  pprint.pprint(s[3][1].keys())
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_SRC python
+[u'org-data', None]
+[u'CATEGORY',
+ u'begin',
+ u'raw-value',
+ u'end',
+ u'parent',
+ u'commentedp',
+ u'pre-blank',
+ u'archivedp',
+ u'contents-end',
+ u'level',
+ u'footnote-section-p',
+ u'priority',
+ u'post-blank',
+ u'hiddenp',
+ u'todo-type',
+ u'quotedp',
+ u'title',
+ u'todo-keyword',
+ u'contents-begin',
+ u'tags']
+#+END_SRC
+
+* Nodify
+
+Using JSON from Python is just a big fat nested data structure.  Orgonpy provides an org-element facade.
+
+First, local hack to see in-source Python modules
+
+#+BEGIN_SRC python :session :results none
+  import sys
+  sys.path.insert(0,'python') 
+  import orgmode.element
+#+END_SRC
+
+
+
+#+BEGIN_SRC python :session :results output code
+  top = orgmode.element.nodify(s)
+  print(type(top))
+  print(top.type)
+  print(len(top.body))
+  print(top.body[0].type)
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_SRC python
+
+<class 'orgmode.element.Node'>
+org-data
+3
+section
+#+END_SRC
+
+
+
