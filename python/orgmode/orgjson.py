@@ -10,9 +10,34 @@ This module provides an expression of this schema.
 
 '''
 
-schema = 
+import os
+import shutil
+import tempfile
+import subprocess
 
-import json
-from collections import namedtuple
+def dumps(orgstring, temporg='orgjson.org'):
+    '''
+    Return JSON string representing org-element tree made from <orgstring>.
+    '''
+    tmpdir = tempfile.mkdtemp()
+
+    el_fname = os.path.join(os.path.dirname(__file__), 'orgjson.el')
+    org_fname = os.path.join(tmpdir, temporg)
+    json_fname = os.path.join(tmpdir, 'orgjson.json')
+
+    open(org_fname,'w').write(orgstring)
+
+    # fixme: make independent from user env?
+    cmd = ['/usr/bin/emacs','--batch','-l',el_fname,'--eval']
+    cmd += ["(org2jsonfile \"%s\" \"%s\")" % (org_fname, json_fname)]
+    print ('Running: %s' % cmd)
+    subprocess.check_call(cmd)
+    json_string = open(json_fname).read()
+    shutil.rmtree(tmpdir)
+    return json_string
+
+
+
+    
 
 

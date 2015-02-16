@@ -47,6 +47,15 @@
     (with-temp-file path
       (insert (org-json-tree-to-json-string tree)))))
 
+(defun org-json-dump-file (filename)
+  "Dump org file to json"
+  (progn
+    (save-excursion
+      (find-file filename)
+      (princ (org-json-buffer-to-json-string 
+	      (org-json-straigten-tree
+	       (org-json-buffer-to-tree)))))))
+
 (defun org-json-buffer-to-json-file-old (&optional path)
   "Write a JSON file from the current org buffer"
   (interactive "Fwrite to JSON file: ")
