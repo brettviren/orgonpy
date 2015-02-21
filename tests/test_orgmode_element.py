@@ -2,7 +2,7 @@
 
 import common
 
-from orgmode.element import nodify
+from orgmode.element import nodify, dump
 
 def test_nodify():
     d = common.sample_org_json_data()
@@ -10,7 +10,7 @@ def test_nodify():
 
     n = nodify(d)
     assert (n)
-    
+    dump(n)
 
 if '__main__' == __name__:
     test_nodify()

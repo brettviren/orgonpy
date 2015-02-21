@@ -4,11 +4,18 @@ You've tried org, but have you tried org while on... Python!?
 
 * Overview
 
-I want a way to process Org files using Python and typically from Emacs.  This desire is largely driven because I have not managed to become as comfortable in Elisp as I have in Python.  There are existing Org document parsers accessible from Python but they are all limited to a sub-set of the Org syntax. 
+I want a way to process Org files using Python.  This desire is largely driven because I have not managed to become as comfortable in Elisp as I have in Python but also to do some org processing without fully needing Emacs in the processing chain.  There are existing Python Org parsers, this isn't one of them as it doesn't actually parse Org. 
 
-Org On Python was born out of an idea on the org-mode mailing list to use Emacs to do the parsing.  After all, it's the best parser around, by construction.  Since v8 of org there is a new =org-element= system to handle the parsing into a syntax tree.  Except for inter-object references, this tree is flat and full of simple data types and can be relatively trivially serialized to text either in a sexp format or JSON.
+Org On Python was born out of an idea on the org-mode mailing list to use Emacs to do the parsing.  After all, it's the best parser around, by construction.  Since v8 of org there is a new =org-element= system to handle the parsing into a syntax tree.  Except for inter-object references, this tree is flat and full of simple data types and can be relatively trivially serialized to text either in a sexp format or JSON.  
 
 * How to
 
-This is still a work in progress.
+This is still a work in progress.  See the [[./tests/]].
+
+* Pelican plugin
+
+Ultimately this project was driven by me wanting to have something a
+bit more than simple org-publish.  The current attempt is to provide this something more in the form of a
+[[./pelican-plugin]].
+
 

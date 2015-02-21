@@ -1,0 +1,26 @@
+#+TITLE: A sample blog post for testing
+#+DATE: [2015-02-21 Sat]
+#+AUTHOR: Mr. Test
+#+CATEGORY: tag1,tag2,tag3
+
+Some preambling.
+
+* The thing that happened.
+
+This one time at band camp...
+
+** This
+
+#+BEGIN_SRC python
+  def hello():
+      print ('hello world')
+#+END_SRC
+
+** That
+
+Blerg, blag, blob.
+
+** Other thing
+
+That's it.
+

@@ -8,10 +8,7 @@ http://orgmode.org/worg/exporters/org-element-docstrings.html
 
 '''
 
-from collections import namedtuple
-
-NodeType = namedtuple("Node","type params parent body")
-def Node(type, params = None, parent = None, body = None):
+class Node(object):
     '''Node - a minimal representation of high level org-element objects.
 
     <params> is a dictionary of org-element parameters (likely minus a
@@ -21,7 +18,70 @@ def Node(type, params = None, parent = None, body = None):
 
     <body> can be None, a string or a list of other Node objects.
     '''
-    return NodeType(type, params or dict(), parent, body or list())
+    def __init__(self, type, params=None, parent=None, body=None):
+        self.type = type
+        self.params = params or dict()
+        self.parent = parent
+        self.body = body or list()
+
+    def __str__(self):
+        p = None
+        if self.parent:
+            p = id(self.parent)
+        keys = ','.join(sorted(self.keys()))
+        return '<Node:%s [%s] (parent:%s) (%d children) keys:{%s}>' % \
+            (id(self), self.type, p, len(self.body), keys)
+
+    def __getattr__(self, name):
+        if self.istext():
+            raise KeyError('No such keyword "%s"' % name) # node body isn't a list
+        for child in self.body:
+            if child.type != 'keyword':
+                continue
+            if child.params['key'].lower() == name.lower():
+                return child.params['value']
+        raise KeyError('No such keyword "%s"' % name)
+
+    def get(self, name, default=None):
+        'Return a keyword value by name or default.'
+        try:
+            return self[name]
+        except KeyError:
+            return default
+
+    def keys(self):
+        'Return list of keyword node keys which may exist as direct children.'
+        if self.istext():
+            return []
+        ret = list()
+        for child in self.body:
+            if child.type != 'keyword':
+                continue
+            ret.append(child.params['key'].lower())
+        return ret
+            
+    def __getitem__(self, index):
+        'Return child at <index>.  Will return a character if body is text'
+        if type(index) == int:
+            return self.body[index]
+        return self.__getattr__(index) # is this evil?
+
+    def istext(self):
+        'Return True if body is text'
+        return type(self.body) != type([])
+        
+
+    pass
+
+def dump(node, depth=0, tab='  '):
+    print '%s%s' % (tab*depth, node)
+    if node.istext():
+        print'%s<Text:%s...>' % (tab*depth, node.body[:20].strip())
+    else:
+        for child in node.body:
+            dump(child, depth+1)
+
+
 
 def nodify(data, parent = None):
     '''Produce a node hierarchy from data.

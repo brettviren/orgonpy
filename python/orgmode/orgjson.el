@@ -1,3 +1,4 @@
+;; Fixme: need to not hard code this!
 (add-to-list 'load-path "~/.emacs.d/elpa/org-20150119")
 
 (require 'org)
@@ -25,9 +26,13 @@
   (progn
     (save-excursion
       (find-file infile)
-      (let* ((tree (org-element-parse-buffer 'object nil)))
+      (let* ((tree (org-element-parse-buffer 'object nil))
+	     (html (org-export-as 'html nil nil t)))
 	(with-temp-file outfile
 	  (insert (json-encode 
 		   (list
-		    :html (org-export-as 'html nil nil t)
+		    :html html
 		    :tree (straigten-tree tree)))))))))
+
+;(org2jsonfile "/opt/bv/projects/pelican-blog/orgonpy/tests/samples/blog.org" 
+;	      "/tmp/blog.json" )

@@ -11,7 +11,7 @@ sys.path.insert(0,os.path.join(srcdir, 'python'))
 
 
 def sample_org_json_data(filename = 'simple.json'):
-    return json.loads(open(os.path.join(testdir, "samples/simple.json")).read())
+    return json.loads(open(os.path.join(testdir, "samples",filename)).read())
 
 def sample_org_data(filename = 'simple.org'):
-    return open(os.path.join(testdir, "samples/simple.org")).read()
+    return open(os.path.join(testdir, "samples", filename)).read()

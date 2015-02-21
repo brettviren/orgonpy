@@ -15,7 +15,7 @@ import shutil
 import tempfile
 import subprocess
 
-def dumps(orgstring, temporg='orgjson.org'):
+def dumps(orgstring, temporg='orgjson.org', debug = False):
     '''
     Return JSON string representing org-element tree made from <orgstring>.
     '''
@@ -30,14 +30,15 @@ def dumps(orgstring, temporg='orgjson.org'):
     # fixme: make independent from user env?
     cmd = ['/usr/bin/emacs','--batch','-l',el_fname,'--eval']
     cmd += ["(org2jsonfile \"%s\" \"%s\")" % (org_fname, json_fname)]
-    print ('Running: %s' % cmd)
-    subprocess.check_call(cmd)
+    stderr = subprocess.STDOUT
+    if debug:
+        print ('Running: %s' % ' '.join(cmd))
+        stderr = None
+    subprocess.check_output(cmd, stderr=stderr)
     json_string = open(json_fname).read()
     shutil.rmtree(tmpdir)
     return json_string
 
 
-
-    
 
 
