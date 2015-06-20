@@ -35,24 +35,27 @@ class OrgOnPelican(readers.BaseReader):
 
     def read(self, filename):
 
-        org_text = open(filename).read()
-        html, top = orgutil.htmltree(org_text)
+        html, top = orgutil.htmltree(filename)
 
         first = top[0]
 
+        justfname = os.path.basename(filename)
         fullpath = os.path.realpath(filename)
         fileslug, _ = os.path.splitext(os.path.basename(fullpath))
         if fileslug == 'index':
             fileslug = os.path.basename(os.path.dirname(fullpath))
 
-        #sys.stderr.write('Default slug: %s\n' % fileslug)
+        sys.stderr.write('Default slug: %s\n' % fileslug)
 
         metadata = dict(
             title = first.get('title',""),
             author = first.get('author',""),
             date = str(orgutil.date(first.get('date',"1970-01-01"))),
-            tags = first.get('category',""),
+            category = first.get('category',"misc"),
             slug = first.get('slug',fileslug),
+            tags = first.get('tags',''),
+            url = fileslug,
+            save_as = os.path.join(fileslug, justfname.replace('.org','.html'))
         )
         #sys.stderr.write('Metadata: %s\n' % str(metadata))
 

@@ -97,14 +97,25 @@ def nodify(data, parent = None):
     restored explicitly into the 'parent' parameter of a node and the
     'parent' key of the params will be removed, if it is found.
     '''
+
+    assert (type(data) == list, "Want list got %s"%type(data))
+
     try:
         typ = data[0]
         par = data[1]
     except IndexError:
+        if type (data) == unicode and not data.strip():
+            return
         print 'Bad data: %s:"%s"' % (type(data), data)
         raise
+#    print 'ORGONPY: typ=',type(typ),str(typ)
+#    print 'ORGONPY: par=',type(par),str(par)
+#    print 'ORGONPY: rest=',type(data[2:]),str(data[2:])
 
     if par:
+        if type(par) != dict:
+            print 'Bad params:',type(par),str(par)
+            assert(False)
         par = dict(par)         # don't mess up caller's data
         del(par['parent'])
 
@@ -112,11 +123,22 @@ def nodify(data, parent = None):
         return Node(typ, par, parent)
 
     if isinstance(data[2], list): # body holds more nodes
+        #print 'DATA2 LIST:',data[2]
         thisnode = Node(typ, par, parent)        
-        body = [nodify(x, thisnode) for x in data[2:]]
+        body = list()
+        for chunk in data[2:]:
+            if type(chunk) == unicode:
+                n = Node(typ, par, parent, chunk)
+            else:
+                n = nodify(chunk, thisnode)
+            if n is None:
+                continue
+            body.append(n)
+        #body = [nodify(x, thisnode) for x in data[2:]]
         thisnode.body.extend(body)
         return thisnode
 
+    #print 'DATA2 STRING:',data[2]
     # body is just a simple string
     return Node(typ, par, parent, data[2])
 

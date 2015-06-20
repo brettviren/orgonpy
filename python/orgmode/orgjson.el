@@ -1,5 +1,6 @@
 ;; Fixme: need to not hard code this!
-(add-to-list 'load-path "~/.emacs.d/elpa/org-20150119")
+;(add-to-list 'load-path "~/.emacs.d/elpa/org-20150119")
+(load "~/org-pub/pelican/bootorg.el")
 
 (require 'org)
 (require 'org-element)
@@ -27,12 +28,15 @@
     (save-excursion
       (find-file infile)
       (let* ((tree (org-element-parse-buffer 'object nil))
+;	     (md (org-export-as 'gfm nil nil t))
 	     (html (org-export-as 'html nil nil t)))
 	(with-temp-file outfile
 	  (insert (json-encode 
 		   (list
 		    :html html
+;		    :markdown md
 		    :tree (straigten-tree tree)))))))))
 
 ;(org2jsonfile "/opt/bv/projects/pelican-blog/orgonpy/tests/samples/blog.org" 
 ;	      "/tmp/blog.json" )
+;(org2jsonfile "/home/bv/org-pub/topics/waf/index.org" "/tmp/orgjsonHpAO8D.json")

@@ -5,12 +5,13 @@ import orgjson
 import element
 import datetime
 
-def htmltree(org_text):
+def htmltree(orgfile):
     '''
     Return tuple (html,tree) from org-mode text where <tree> is the top element.Node
     '''
-    json_text = orgjson.dumps(org_text, debug=True)
+    json_text = orgjson.dumpf(orgfile, debug=True)
     dat = json.loads(json_text)
+    #print json.dumps(dat,indent=2)
     return (dat['html'], element.nodify(dat['tree']))
 
 def date(org_text):
