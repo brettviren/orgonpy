@@ -39,4 +39,4 @@
 
 ;(org2jsonfile "/opt/bv/projects/pelican-blog/orgonpy/tests/samples/blog.org" 
 ;	      "/tmp/blog.json" )
-;(org2jsonfile "/home/bv/org-pub/topics/waf/index.org" "/tmp/orgjsonHpAO8D.json")
+;(org2jsonfile "/home/bv/org-pub/topics/waf/index.org" "/tmp/foo.json")

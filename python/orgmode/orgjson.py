@@ -26,8 +26,8 @@ def dumpf(orgfile, debug = False):
     el_fname = os.path.join(os.path.dirname(__file__), 'orgjson.el')
     _, json_fname = tempfile.mkstemp('.json',prefix='orgjson')
 
-    sys.stderr.write('Dumping file: %s\n' % orgfile)
-    sys.stderr.write('To: %s\n' % str(json_fname))
+    #sys.stderr.write('Dumping file: %s\n' % orgfile)
+    #sys.stderr.write('To: %s\n' % str(json_fname))
 
     # fixme: make independent from user env?
     cmd = ['/usr/bin/emacs','-Q','--batch','-l',el_fname,'--eval']
@@ -38,7 +38,8 @@ def dumpf(orgfile, debug = False):
         stderr = None
     subprocess.check_output(cmd, stderr=stderr, cwd=orgdir)
     json_string = open(json_fname).read()
-    print 'Not removing temporary json file:\n%s' % json_fname
+    #print 'Not removing temporary json file:\n%s' % json_fname
+    os.remove(json_fname)
     return json_string
 
 

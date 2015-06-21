@@ -19,6 +19,8 @@ then its directory will be used.
 '''
 import os
 import sys
+import time
+import datetime
 import logging
 
 from pelican import readers
@@ -35,7 +37,7 @@ class OrgOnPelican(readers.BaseReader):
 
     def read(self, filename):
 
-        html, top = orgutil.htmltree(filename)
+        html, top = orgutil.htmltree(filename, debug=False)
 
         first = top[0]
 
@@ -45,19 +47,36 @@ class OrgOnPelican(readers.BaseReader):
         if fileslug == 'index':
             fileslug = os.path.basename(os.path.dirname(fullpath))
 
-        sys.stderr.write('Default slug: %s\n' % fileslug)
+        #sys.stderr.write('Default slug: %s\n' % fileslug)
+
+        modified = first.get('modified',None)
+        if modified:
+            modified = orgutil.date(modified) # clean of org cruft
+        else:
+            modified = datetime.date(*time.localtime(os.path.getmtime('.'))[:3])
+
+        created = first.get('date',None)
+        if created:
+            created = orgutil.date(created) # clean of org cruft
+        else:
+            created = datetime.date(*time.localtime(os.path.getctime('.'))[:3])
 
         metadata = dict(
             title = first.get('title',""),
+            subtitle = first.get('subtitle',""),
             author = first.get('author',""),
-            date = str(orgutil.date(first.get('date',"1970-01-01"))),
+            date = str(created),
+            modified = str(modified), # long cat is long
             category = first.get('category',"misc"),
             slug = first.get('slug',fileslug),
             tags = first.get('tags',''),
             url = fileslug,
             save_as = os.path.join(fileslug, justfname.replace('.org','.html'))
         )
-        #sys.stderr.write('Metadata: %s\n' % str(metadata))
+
+        #sys.stderr.write('METADATA:\n\t\n')
+        #sys.stderr.write('\t\n'.join(['%s:%s' % kv for kv in metadata.items()]))
+        #sys.stderr.write('\n')
 
         parsed = {}
         for key, value in metadata.items():
