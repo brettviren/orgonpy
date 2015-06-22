@@ -48,7 +48,7 @@ def extract_toc(content):
             h2=tag.find('h2')   # 'Table of Contents'
             if h2: h2.extract()
             orgfile = path.basename(content.source_path)
-            tag.html.body.div.append(BeautifulSoup('<a href="%s">Org source</a>'%orgfile).html.body.a)
+            tag.append(BeautifulSoup('<a href="%s">Org source</a>'%orgfile))
             toc=tag
 
     elif not toc:  # Pandoc reader

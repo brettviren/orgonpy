@@ -37,7 +37,7 @@ class OrgOnPelican(readers.BaseReader):
 
     def read(self, filename):
 
-        html, top = orgutil.htmltree(filename, debug=False)
+        html, top = orgutil.htmltree(filename, debug=True)
 
         first = top[0]
 

@@ -12,7 +12,9 @@ def htmltree(orgfile, debug=False):
     json_text = orgjson.dumpf(orgfile, debug=debug)
     dat = json.loads(json_text)
     #print json.dumps(dat,indent=2)
-    return (dat['html'], element.nodify(dat['tree']))
+    node = element.nodify(dat['tree'])
+    assert(node, "No node for %s" % orgfile)
+    return (dat['html'], node)
 
 def date(org_text = None):
     '''
